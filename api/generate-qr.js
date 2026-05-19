@@ -1,7 +1,6 @@
-import { BakongKHQR, IndividualInfo, khqrData } from "bakong-khqr";
+const { BakongKHQR, khqrData, IndividualInfo } = require("bakong-khqr");
 
-export default async function handler(req, res) {
-  // Allow frontend to call this API
+module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -22,7 +21,7 @@ export default async function handler(req, res) {
     };
 
     const individualInfo = new IndividualInfo(
-      "puthyon_chandara@bkrt",  // your Bakong account
+      "puthyon_chandara@bkrt",
       merchantName || "Puthyon Chandara",
       "Phnom Penh",
       optionalData
@@ -30,6 +29,8 @@ export default async function handler(req, res) {
 
     const KHQR = new BakongKHQR();
     const result = KHQR.generateIndividual(individualInfo);
+
+    console.log("SDK result:", JSON.stringify(result));
 
     if (!result || !result.data) {
       return res.status(500).json({ error: "Failed to generate QR", detail: result });
@@ -44,4 +45,4 @@ export default async function handler(req, res) {
     console.error("Generate QR error:", err);
     return res.status(500).json({ error: "Server error", detail: err.message });
   }
-}
+};
