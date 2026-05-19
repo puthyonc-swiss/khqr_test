@@ -15,9 +15,13 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ error: "Invalid amount" });
     }
 
+    // Expiration: 30 minutes from now (required for dynamic QR)
+    const expirationTimestamp = Date.now() + 30 * 60 * 1000;
+
     const optionalData = {
       currency: khqrData.currency.usd,
       amount: parseFloat(amount),
+      expirationTimestamp: expirationTimestamp,
     };
 
     const individualInfo = new IndividualInfo(
@@ -32,8 +36,11 @@ module.exports = async function handler(req, res) {
 
     console.log("SDK result:", JSON.stringify(result));
 
-    if (!result || !result.data) {
-      return res.status(500).json({ error: "Failed to generate QR", detail: result });
+    if (!result || !result.data || result.status.code !== 0) {
+      return res.status(500).json({ 
+        error: "Failed to generate QR", 
+        detail: result.status 
+      });
     }
 
     return res.status(200).json({
