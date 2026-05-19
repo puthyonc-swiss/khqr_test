@@ -4,86 +4,81 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>KHQR Payment Test</title>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: sans-serif;
-      background: #f4f4f4;
+      background: #f0f2f5;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
       padding: 20px;
     }
-
     .card {
       background: white;
-      border-radius: 16px;
-      padding: 32px;
-      max-width: 420px;
+      border-radius: 20px;
+      padding: 36px 28px;
+      max-width: 400px;
       width: 100%;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      box-shadow: 0 4px 30px rgba(0,0,0,0.10);
       text-align: center;
     }
-
-    h1 { font-size: 20px; color: #1a1a1a; margin-bottom: 6px; }
-    .subtitle { font-size: 14px; color: #888; margin-bottom: 24px; }
-
-    .amount-row {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
+    h1 { font-size: 22px; color: #1a1a1a; margin-bottom: 6px; }
+    .subtitle { font-size: 14px; color: #999; margin-bottom: 28px; }
 
     input[type="number"] {
-      flex: 1;
-      padding: 12px 16px;
+      width: 100%;
+      padding: 14px 16px;
       border: 1.5px solid #e0e0e0;
-      border-radius: 10px;
-      font-size: 16px;
+      border-radius: 12px;
+      font-size: 18px;
       outline: none;
-      transition: border 0.2s;
+      margin-bottom: 14px;
+      text-align: center;
     }
-    input[type="number"]:focus { border-color: #3b5bdb; }
+    input[type="number"]:focus { border-color: #4361ee; }
 
-    button {
-      padding: 12px 24px;
-      background: #3b5bdb;
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: #4361ee;
       color: white;
       border: none;
-      border-radius: 10px;
-      font-size: 15px;
+      border-radius: 12px;
+      font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s;
-      width: 100%;
     }
-    button:hover { background: #2f4ac7; }
-    button:disabled { background: #aaa; cursor: not-allowed; }
+    .btn:hover { background: #3451d1; }
+    .btn:disabled { background: #aaa; cursor: not-allowed; }
+    .btn-outline {
+      background: white;
+      color: #4361ee;
+      border: 1.5px solid #4361ee;
+      margin-top: 12px;
+    }
+    .btn-outline:hover { background: #f0f4ff; }
 
-    /* Screens */
     .screen { display: none; }
     .screen.active { display: block; }
 
-    /* QR screen */
-    #qr-canvas {
-      margin: 20px auto;
-      display: block;
-    }
-
     .amount-display {
-      font-size: 28px;
-      font-weight: 700;
+      font-size: 36px;
+      font-weight: 800;
       color: #1a1a1a;
-      margin-bottom: 4px;
+      margin: 12px 0 4px;
     }
+    .scan-hint { font-size: 13px; color: #999; margin-bottom: 20px; }
 
-    .scan-hint {
-      font-size: 13px;
-      color: #888;
-      margin-bottom: 20px;
+    #qr-img {
+      width: 220px;
+      height: 220px;
+      margin: 0 auto 20px;
+      display: block;
+      border: 1px solid #eee;
+      border-radius: 12px;
+      padding: 8px;
     }
 
     .status-row {
@@ -91,55 +86,38 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      font-size: 13px;
+      font-size: 14px;
       color: #888;
-      margin-top: 16px;
+      margin-top: 8px;
     }
-
     .dot {
-      width: 8px;
-      height: 8px;
+      width: 10px; height: 10px;
       background: #f59f00;
       border-radius: 50%;
       animation: pulse 1.2s ease-in-out infinite;
     }
-
     @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.8); }
+      0%,100% { opacity:1; transform:scale(1); }
+      50% { opacity:0.4; transform:scale(0.7); }
     }
 
-    /* Success screen */
     .success-icon {
-      width: 72px;
-      height: 72px;
+      width: 80px; height: 80px;
       background: #ebfbee;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       margin: 0 auto 16px;
-      font-size: 36px;
+      font-size: 40px;
     }
+    .success-title { font-size: 24px; font-weight: 700; color: #2f9e44; margin-bottom: 8px; }
+    .success-detail { font-size: 14px; color: #666; margin-bottom: 24px; }
 
-    .success-title {
-      font-size: 22px;
-      font-weight: 700;
-      color: #2f9e44;
-      margin-bottom: 8px;
-    }
-
-    .success-detail {
-      font-size: 14px;
-      color: #555;
-      margin-bottom: 24px;
-    }
-
-    /* Error */
-    .error-msg {
+    .error-box {
       background: #fff5f5;
       color: #c92a2a;
-      border-radius: 8px;
+      border-radius: 10px;
       padding: 10px 14px;
       font-size: 13px;
       margin-top: 12px;
@@ -148,53 +126,43 @@
   </style>
 </head>
 <body>
-
 <div class="card">
 
   <!-- Screen 1: Enter amount -->
   <div class="screen active" id="screen-pay">
-    <h1>KHQR Payment Test</h1>
+    <h1>KHQR Payment</h1>
     <p class="subtitle">Enter amount to generate QR code</p>
-
-    <div class="amount-row">
-      <input type="number" id="amount-input" placeholder="Amount (USD)" min="0.01" step="0.01" value="1.00"/>
-    </div>
-
-    <button id="pay-btn" onclick="startPayment()">Generate QR</button>
-    <div class="error-msg" id="error-msg"></div>
+    <input type="number" id="amount-input" placeholder="Amount in USD" min="0.01" step="0.01" value="1.00"/>
+    <button class="btn" onclick="startPayment()">Generate QR</button>
+    <div class="error-box" id="error-box"></div>
   </div>
 
   <!-- Screen 2: Show QR -->
   <div class="screen" id="screen-qr">
     <h1>Scan to Pay</h1>
-    <p class="scan-hint">Open your banking app and scan this QR code</p>
-
+    <p class="scan-hint">Open Bakong or your banking app and scan</p>
     <div class="amount-display" id="amount-display">$0.00</div>
-
-    <canvas id="qr-canvas"></canvas>
-
+    <img id="qr-img" src="" alt="QR Code"/>
     <div class="status-row">
       <div class="dot"></div>
       <span>Waiting for payment...</span>
     </div>
+    <button class="btn btn-outline" onclick="cancelPayment()">Cancel</button>
   </div>
 
   <!-- Screen 3: Success -->
   <div class="screen" id="screen-success">
     <div class="success-icon">✓</div>
     <div class="success-title">Payment Successful!</div>
-    <div class="success-detail" id="success-detail">Your payment has been received.</div>
-    <button onclick="resetPage()">Make Another Payment</button>
+    <div class="success-detail" id="success-detail">Payment received.</div>
+    <button class="btn" onclick="resetPage()">Done</button>
   </div>
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <script>
-  // ---- IMPORTANT: Change this to your Vercel URL after deploying ----
   const API_BASE = window.location.origin;
-  // If testing locally with vercel dev, keep as is.
-  // After deploy it will be: https://your-app.vercel.app
-
   let pollInterval = null;
   let currentMd5 = null;
   let currentAmount = 0;
@@ -205,17 +173,13 @@
   }
 
   function showError(msg) {
-    const el = document.getElementById("error-msg");
+    const el = document.getElementById("error-box");
     el.textContent = msg;
     el.style.display = "block";
   }
 
-  function hideError() {
-    document.getElementById("error-msg").style.display = "none";
-  }
-
   async function startPayment() {
-    hideError();
+    document.getElementById("error-box").style.display = "none";
     const amount = parseFloat(document.getElementById("amount-input").value);
 
     if (!amount || amount <= 0) {
@@ -223,7 +187,7 @@
       return;
     }
 
-    const btn = document.getElementById("pay-btn");
+    const btn = document.querySelector("#screen-pay .btn");
     btn.disabled = true;
     btn.textContent = "Generating...";
 
@@ -235,29 +199,35 @@
       });
 
       const data = await res.json();
+      console.log("API response:", data);
 
       if (!res.ok || !data.qr) {
-        throw new Error(data.error || "Failed to generate QR");
+        throw new Error(data.error || data.detail || "Failed to generate QR");
       }
 
       currentMd5 = data.md5;
       currentAmount = amount;
 
-      // Show QR screen
-      document.getElementById("amount-display").textContent = `$${amount.toFixed(2)}`;
-      showScreen("screen-qr");
-
-      // Draw QR code on canvas
-      QRCode.toCanvas(
-        document.getElementById("qr-canvas"),
-        data.qr,
-        { width: 240, margin: 2, color: { dark: "#000000", light: "#ffffff" } }
-      );
-
-      // Start polling every 3 seconds
-      startPolling();
+      // Generate QR as data URL then set to img tag
+      // This avoids the hidden canvas problem
+      QRCode.toDataURL(data.qr, {
+        width: 220,
+        margin: 2,
+        color: { dark: "#000000", light: "#ffffff" }
+      }, function(err, url) {
+        if (err) {
+          console.error("QR render error:", err);
+          showError("QR code render failed.");
+          return;
+        }
+        document.getElementById("qr-img").src = url;
+        document.getElementById("amount-display").textContent = `$${amount.toFixed(2)}`;
+        showScreen("screen-qr");
+        startPolling();
+      });
 
     } catch (err) {
+      console.error("Payment error:", err);
       showError(err.message);
     } finally {
       btn.disabled = false;
@@ -267,30 +237,27 @@
 
   function startPolling() {
     if (pollInterval) clearInterval(pollInterval);
-
     pollInterval = setInterval(async () => {
       try {
         const res = await fetch(`${API_BASE}/api/check-payment?md5=${currentMd5}`);
         const data = await res.json();
-
-        console.log("Poll result:", data);
+        console.log("Payment check:", data);
 
         if (data.paid === true) {
           clearInterval(pollInterval);
-          showSuccess();
+          document.getElementById("success-detail").textContent =
+            `$${currentAmount.toFixed(2)} USD received successfully.`;
+          showScreen("screen-success");
         }
-
       } catch (err) {
         console.error("Polling error:", err);
-        // Keep polling even if one request fails
       }
-    }, 3000); // check every 3 seconds
+    }, 3000);
   }
 
-  function showSuccess() {
-    document.getElementById("success-detail").textContent =
-      `$${currentAmount.toFixed(2)} USD received successfully.`;
-    showScreen("screen-success");
+  function cancelPayment() {
+    if (pollInterval) clearInterval(pollInterval);
+    resetPage();
   }
 
   function resetPage() {
@@ -298,9 +265,9 @@
     currentMd5 = null;
     currentAmount = 0;
     document.getElementById("amount-input").value = "1.00";
+    document.getElementById("qr-img").src = "";
     showScreen("screen-pay");
   }
 </script>
-
 </body>
 </html>
